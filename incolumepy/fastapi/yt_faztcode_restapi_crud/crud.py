@@ -1,5 +1,5 @@
-from fastapi import FastAPI, HTTPException, status
-from h11 import Response
+from urllib import response
+from fastapi import FastAPI, HTTPException, status, Response
 from pydantic import BaseModel
 from typing import Optional, Text
 from datetime import datetime
@@ -28,7 +28,7 @@ def read_root():
 def get_posts():
     return posts
 
-@app.post('/posts')
+@app.post('/posts', status_code=status.HTTP_201_CREATED)
 def save_post(post: Post):
     post.id = str(uuid())
     posts.append(post.dict())
@@ -41,22 +41,24 @@ def get_post(post_id: str):
             return post
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item not found")
 
-@app.delete('/posts/{post_id}')
-def delete_post(post_id: str):
+@app.delete('/posts/{post_id}', status_code=status.HTTP_204_NO_CONTENT)
+def delete_post(post_id: str, resp: Response):
     for index, post in enumerate(posts):
         if post["id"] == post_id:
             posts.pop(index)
+            resp.status_code = status.HTTP_204_NO_CONTENT
             return {"message": "Post has been deleted succesfully"}
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item not found")
+    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Item not found")
 
-@app.put('/posts/{post_id}')
-def update_post(post_id: str, updatedPost: Post):
+@app.put('/posts/{post_id}', status_code=status.HTTP_202_ACCEPTED)
+def update_post(post_id: str, updatedPost: Post, resp: Response):
     for index, post in enumerate(posts):
         if post["id"] == post_id:
             posts[index]["title"]= updatedPost.dict()["title"]
             posts[index]["content"]= updatedPost.dict()["content"]
             posts[index]["author"]= updatedPost.dict()["author"]
+            resp.status_code = status.HTTP_202_ACCEPTED
             return {"message": "Post has been updated succesfully"}
-    raise HTTPException(status_code=404, detail="Item not found")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item not found")
 
 
