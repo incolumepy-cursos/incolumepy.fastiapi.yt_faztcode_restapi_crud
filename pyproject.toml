@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "incolumepy.fastiapi.yt_faztcode_restapi_crud"
-version = "0.2.0"
+version = "0.3.0"
 description = ""
 authors = ["Britodfbr <britodfbr@gmail.com>"]
 packages = [
